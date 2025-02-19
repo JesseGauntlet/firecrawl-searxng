@@ -33,7 +33,16 @@
   </p>
 </div>
 
-# 🔥 Firecrawl
+# 🔥 Firecrawl with SearxNG
+
+======================================================================
+Additions: 
+- Added searxng to the project
+
+Usage:
+- Add to your .env: SEARXNG_URL=http://searxng:8080
+(See .env.example for more details)
+======================================================================
 
 Empower your AI apps with clean data from any website. Featuring advanced scraping, crawling, and data extraction capabilities.
 

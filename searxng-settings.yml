@@ -1,0 +1,68 @@
+use_default_settings: true
+server:
+  secret_key: "your_secret_key_here"  # Change this to a random string
+  bind_address: "0.0.0.0"
+  port: 8080
+  base_url: http://searxng:8080/
+  image_proxy: false
+  http_protocol_version: "1.0"
+  method: "GET"
+  default_http_headers:
+    X-Content-Type-Options: nosniff
+    X-XSS-Protection: 1; mode=block
+    X-Download-Options: noopen
+    X-Robots-Tag: noindex, nofollow
+    Referrer-Policy: no-referrer
+
+search:
+  safe_search: 0
+  autocomplete: "google"
+  default_lang: "en"
+  ban_time_on_fail: 5
+  max_ban_time_on_fail: 120
+  suspended_times:
+    SearxEngineAccessDenied: 86400
+    SearxEngineCaptcha: 86400
+    SearxEngineError: 3600
+    SearxEngineTooManyRequests: 3600
+    cf_SearxEngineCaptcha: 86400
+    cf_SearxEngineAccessDenied: 86400
+  formats:
+    - html
+    - json
+    - csv
+    - rss
+
+server:
+  limiter: false  # Disable rate limiting
+  image_proxy: false  # Disable image proxy
+  http_protocol_version: "1.0"
+  method: "GET"
+  cors_enabled: true  # Enable CORS
+  base_url: http://searxng:8080/
+
+engines:
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: d
+    disabled: false
+
+ui:
+  static_use_hash: false
+  default_locale: en
+  query_in_title: false
+
+general:
+  debug: true  # Enable debug mode
+  instance_name: "firecrawl-searxng"
+  enable_metrics: false
+  enable_http_header_forwarding: false
+  enable_http_header_via: false 

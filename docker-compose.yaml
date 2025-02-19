@@ -12,6 +12,24 @@ x-common-service: &common-service
     - "host.docker.internal:host-gateway"
 
 services:
+  searxng:
+    image: searxng/searxng:latest
+    networks:
+      - backend
+    ports:
+      - "8080:8080"
+    environment:
+      - BASE_URL=http://localhost:8080/
+      - INSTANCE_NAME=firecrawl-searxng
+      - SEARXNG_DEBUG=true
+      - SEARXNG_DISABLE_METRICS=true
+      - SEARXNG_DISABLE_USERAGENT_FORWARDING=true
+      - SEARXNG_DISABLE_WEBAPP=false
+      - SEARXNG_DISABLE_HTTP_HEADER_FORWARDING=true
+    volumes:
+      - ./searxng-settings.yml:/etc/searxng/settings.yml
+      - searxng-data:/etc/searxng
+
   playwright-service:
     build: apps/playwright-service
     environment:
@@ -22,6 +40,8 @@ services:
       - BLOCK_MEDIA=${BLOCK_MEDIA}
     networks:
       - backend
+    ports:
+      - "3000:3000"
 
   api:
     <<: *common-service
@@ -48,13 +68,15 @@ services:
       SCRAPING_BEE_API_KEY: ${SCRAPING_BEE_API_KEY}
       HOST: ${HOST:-0.0.0.0}
       SELF_HOSTED_WEBHOOK_URL: ${SELF_HOSTED_WEBHOOK_URL}
-      SERPER_API_KEY: ${SERPER_API_KEY}
+      SEARPER_API_KEY: ${SERPER_API_KEY}
       SEARCHAPI_API_KEY: ${SEARCHAPI_API_KEY}
+      SEARXNG_URL: ${SEARXNG_URL:-http://searxng:8080}
       LOGGING_LEVEL: ${LOGGING_LEVEL}
       FLY_PROCESS_GROUP: app
     depends_on:
       - redis
       - playwright-service
+      - searxng
     ports:
       - "3002:3002"
     command: [ "pnpm", "run", "start:production" ]
@@ -84,12 +106,14 @@ services:
       SCRAPING_BEE_API_KEY: ${SCRAPING_BEE_API_KEY}
       HOST: ${HOST:-0.0.0.0}
       SELF_HOSTED_WEBHOOK_URL: ${SELF_HOSTED_WEBHOOK_URL}
+      SEARXNG_URL: ${SEARXNG_URL:-http://searxng:8080}
       LOGGING_LEVEL: ${LOGGING_LEVEL}
       FLY_PROCESS_GROUP: worker
     depends_on:
       - redis
       - playwright-service
       - api
+      - searxng
     command: [ "pnpm", "run", "workers" ]
 
   redis:
@@ -97,6 +121,9 @@ services:
     networks:
       - backend
     command: redis-server --bind 0.0.0.0
+
+volumes:
+  searxng-data:
 
 networks:
   backend:
